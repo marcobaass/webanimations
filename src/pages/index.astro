@@ -1,0 +1,58 @@
+---
+import '../assets/reset.css'
+import '../assets/global.css'
+
+import Navbar from '../components/Navbar.astro'
+import HeroTextScramble from '../components/HeroTextScramble.astro'
+import ImagePuzzle from '../components/ImagePuzzle.astro';
+import ImagePuzzleText from '../components/ImagePuzzleText.astro';
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Webanimations</title>
+</head>
+
+<body>
+  <div class="page-transition"></div>
+  <header>
+    <Navbar />
+  </header>
+
+  <main>
+    <HeroTextScramble />
+    <div id="puzzle">
+      <ImagePuzzle gridCols={5} gridRows={3}/>
+      <ImagePuzzleText />
+    </div>
+  </main>
+
+</body>
+
+</html>
+
+<style>
+  .page-transition {
+    position: absolute;
+    width: 100%;
+    height: 100vh;
+    background-color: var(--clr-accent);
+    z-index: 1000;
+    animation: slideUp 750ms 750ms forwards ease-in;
+  }
+
+  @keyframes slideUp {
+    0% {
+      transform: translateY(0%);
+    }
+    100% {
+      transform: translateY(-100%);
+    }
+  }
+
+  #puzzle {
+    display: flexbox;
+  }
+</style>

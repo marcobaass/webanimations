@@ -1,0 +1,83 @@
+---
+
+---
+
+<h1>Exploring the Art of Animated <span class="hero-words">Motion</span></h1>
+
+<script>
+  import { gsap } from "gsap";
+
+  document.addEventListener('DOMContentLoaded', () => {
+
+    let heroWordSpan = document.querySelector('.hero-words');
+
+    // Exit early if the element isn't found
+    if (!heroWordSpan) {
+      console.error("Hero words span element not found!");
+      return;
+    }
+
+    //Setup of Words to Scramble, and Delays initially, for each character and for each word
+    const heroWords: string[] = ["Motion", "Interaction", "Storytelling", "Experiences", "Possibilities"];
+    const initialDelay: number = 2;
+    const characterDelay: number = 50;
+    const wordDelay: number = 1;
+
+    let currentWordIndex: number = 0;
+
+    // initializing function to wrap the heroWords array
+    const wrapIndex = gsap.utils.wrap(0, heroWords.length)
+
+
+
+    // --- Function to transition between two words ---
+
+    function animateWordTransition(startIndex: number, endIndex: number): number {
+      // Basic index validation
+      if (startIndex < 0 || endIndex >= heroWords.length || endIndex < 0 || startIndex >= heroWords.length) {
+        console.error("Invalid word indices for transition:", startIndex, endIndex);
+        return 0
+      }
+
+      const startWord = heroWords[startIndex];
+      const endWord = heroWords[endIndex];
+      const maxLength = Math.max(startWord.length, endWord.length)
+
+      for(let i = 0; i < maxLength; i++) {
+        // Calculate the string to display at this step:
+        // Take the beginning of the endWord + the remaining part of the startWord
+        const intermediateWord = endWord.substring(0, i + 1) + startWord.substring(i + 1);
+
+        gsap.delayedCall((i * characterDelay) / 1000, () => {
+          if (heroWordSpan) {
+            heroWordSpan.innerHTML = intermediateWord;
+          }
+        })
+      }
+      const durationInSeconds = (maxLength * characterDelay) / 1000
+      return durationInSeconds
+    }
+
+    function cycleWords() {
+      const nextWordIndex = wrapIndex(currentWordIndex + 1);
+      const transitionDuration = animateWordTransition(currentWordIndex, nextWordIndex) + wordDelay;
+      currentWordIndex = nextWordIndex;
+      gsap.delayedCall(transitionDuration, () => {cycleWords()})
+    }
+
+
+
+    // --- Trigger the first transition after the initial delay ---
+    gsap.delayedCall(initialDelay, () => {
+      let nextWordIndex = currentWordIndex + 1;
+      if (nextWordIndex < heroWords.length) {
+        cycleWords()
+      } else {
+        currentWordIndex = 0;
+        nextWordIndex = currentWordIndex
+      }
+    })
+  })
+
+
+</script>

@@ -1,0 +1,354 @@
+---
+import { Image } from 'astro:assets'
+import puzzleImage from '../assets/puzzle.jpg'
+
+interface Props {
+  gridCols?: number;
+  gridRows?: number;
+}
+
+const { gridCols = 5, gridRows = 3 } = Astro.props
+
+// We need unique IDs if multiple puzzles are on the page
+const uniqueId = `puzzle-${Math.random().toString(36).substring(2, 9)}`;
+const containerId = `${uniqueId}-container`;
+const sourceImageId = `${uniqueId}-source`;
+const tileClass = `${uniqueId}-tile`; //Unique class for targeting tiles
+---
+
+<div
+  id={containerId}
+  class="puzzle-container"
+  data-cols={gridCols}
+  data-rows={gridRows}
+  data-image-id={sourceImageId}
+  data-tile-class={tileClass}
+>
+  <div class="loading-message">Loading image...</div>
+  <Image
+    id={sourceImageId}
+    src={puzzleImage}
+    alt="Source image for puzzle"
+    class="source-image"
+    aria-hidden="true"
+    width={puzzleImage.width}
+    height={puzzleImage.height}
+    loading="eager"
+  />
+</div>
+
+<style>
+
+  .puzzle-container {
+    position: relative;
+    border: 2px solid #ccc;
+    border-radius: 16px;
+    overflow: hidden;
+    --tileBgUrl: '';
+  }
+
+  .source-image{
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  :global(.puzzle-tile) {
+    position: absolute;
+    border: 2px solid lightgrey;
+    background-repeat: no-repeat;
+    cursor: grab;
+    user-select: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+    box-sizing: border-box;
+    background-image: var(--tileBgUrl);
+    border-radius: 16px
+  }
+
+  .puzzle-tile:active, .puzzle-tile.gsap-dragging {
+    cursor: grabbing;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+    z-index: 100;
+  }
+
+  :global(.correct-place) {
+    animation: success 0.5s forwards ease-in-out;
+  }
+
+  @keyframes success {
+    50% {
+      filter: brightness(2)
+    }
+
+    60% {
+      filter: brightness(1)
+    }
+
+    100% {
+      border: 2px solid green;
+    }
+  }
+
+</style>
+
+<script>
+
+  import { gsap } from "gsap";
+  import { Draggable } from "gsap/Draggable";
+  gsap.registerPlugin(Draggable);
+
+  let correctPlacements = 0;
+  const container = document.querySelector('.puzzle-container') as HTMLElement | null;
+  const sourceImage = container?.querySelector('.source-image') as HTMLImageElement | null;
+  const loadingMessage = container?.querySelector('.loading-message') as HTMLElement | null;
+
+  const tileClassName = container?.dataset.tileClass || '';
+  if (container && !tileClassName) {
+    console.warn("Tile class name not found in data attribute!");
+  }
+
+  let gridCols: number = 5;
+  let gridRows: number = 3;
+  let finalImageUrl: string = '';
+
+  //Creating puzzle tiles
+  function createPuzzle(imgWidth: number, imgHeight: number) {
+
+    if (!container || !finalImageUrl || !tileClassName) {
+      console.error('Container, image URL, or tile class name missing!');
+      if(loadingMessage) loadingMessage.textContent = "Error: Puzzle setup failed.";
+      return;
+    }
+
+    const loadingMsg = container.querySelector('.loading-message');
+    if (loadingMsg) loadingMsg.remove();
+
+    container.querySelectorAll(`.${tileClassName}`).forEach(tile => tile.remove());
+
+    container.style.width = `${imgWidth}px`;
+    container.style.height = `${imgHeight}px`
+
+    // container.style.setProperty('--tileBgUrl', `url(${finalImageUrl})`);
+
+    console.log(`Container size set to ${imgWidth}x${imgHeight}`);
+    console.log(`Using image URL for tiles: ${finalImageUrl}`);
+
+    const tileWidth = imgWidth / gridCols;
+    const tileHeight = imgHeight / gridRows;
+    const totalTiles = gridCols * gridRows;
+
+    console.log(`Tile dimensions: ${tileWidth}x${tileHeight}, Total tiles: ${totalTiles}`);
+
+    const tiles = [];
+
+    for(let i=0; i < totalTiles; i++) {
+      const col = i % gridCols;
+      const row = Math.floor(i / gridCols);
+
+      const tile = document.createElement('div');
+      tile.classList.add('puzzle-tile', tileClassName);
+
+      // Calculate background position
+      const bgPosX = -(col * tileWidth);
+      const bgPosY = -(row * tileHeight);
+
+      tile.dataset.finalX = `${Math.abs(bgPosX)}`
+      tile.dataset.finalY = `${Math.abs(bgPosY)}`
+
+      // Set tile visual styles
+      tile.style.width = `${tileWidth}px`;
+      tile.style.height = `${tileHeight}px`;
+      tile.style.backgroundSize = `${imgWidth}px ${imgHeight}px`;
+      tile.style.backgroundPosition = `${bgPosX}px ${bgPosY}px`;
+      tile.style.backgroundImage = `url(${finalImageUrl})`;
+
+      // First set the tile to start at 0,0
+      tile.style.position = 'absolute';
+      tile.style.top = '0px';
+      tile.style.left = '0px';
+
+      // Calculate Random Position within bounds
+      console.log(`Calculating randomY: imgHeight=${imgHeight}, tileHeight=${tileHeight}`);
+      const randomX = Math.random() * (imgWidth - tileWidth);
+      const randomY = Math.random() * (imgHeight - tileHeight);
+      console.log(`Calculated randomX=${randomX}, randomY=${randomY}`);
+
+      container.appendChild(tile);
+      tiles.push(tile);
+
+      // GSAP to set initial random position
+      gsap.set(tile, {
+        x: randomX,
+        y: randomY,
+        zIndex: i + 2
+      });
+
+    }
+
+    // --- Initialize GSAP Draggable ---
+    type Point = {
+      x: number,
+      y: number
+    }
+    const calculateSnapPoints = (): Point[] => {
+      const points: Point[] = [];
+
+      for(let r = 0; r < gridRows; r++) {
+        for(let c = 0; c < gridCols; c++) {
+          let object: {[x:string]: number} = {x: 0, y: 0}
+          const x = c * tileWidth;
+          const y = r * tileHeight;
+
+          const point: Point = { x: x, y: y };
+          points.push(point);
+        }
+      }
+      console.log("Generated Snap Points:", points)
+      return points;
+    }
+
+    Draggable.create(`.${tileClassName}`, {
+      type: "x,y",
+      bounds: container,
+      edgeResistance: 0.65, // Makes it feel 'sticky at the edges',
+      liveSnap: {
+        points: calculateSnapPoints(),
+        radius: 50,
+      },
+      onDragStart: function() {
+        gsap.to(this.target, {
+          zIndex: totalTiles + 1,
+          duration: 0.1
+        })
+      },
+      onDragEnd: function() {
+        gsap.to(this.target, {
+          duration: 0.1
+        });
+        const currentX = Number(gsap.getProperty(this.target, 'x'));
+        const currentY = Number(gsap.getProperty(this.target, 'y'));
+
+        const finalX = parseFloat(this.target.dataset.finalX || NaN)
+        const finalY = parseFloat(this.target.dataset.finalY || NaN)
+
+        if (isNaN(finalX) || isNaN(finalY)) {
+          console.error("Could not parse finalX or finalY from dataset for", this.target);
+          return;
+        }
+
+        const diffX = Math.abs(finalX - currentX);
+        const diffY = Math.abs(finalY - currentY);
+
+        if(diffX < 3 && diffY < 3) {
+          this.disable();
+          this.target.style.zIndex = 0;
+          this.target.classList.add('correct-place');
+          correctPlacements ++;
+          console.log(correctPlacements);
+          // when puzzle completed
+          if (correctPlacements === gridCols * gridRows) {
+            console.log('complete');
+
+            // collecting puzzles of THIS puzzle instance
+            const allTilesInThisPuzzle = container?.querySelectorAll(`.${tileClassName}`);
+
+            if (!allTilesInThisPuzzle || !sourceImage || !container) {
+              console.error("Cannot complete puzzle, element missing.");
+              return;
+            }
+
+            //fading tiles out and remove them
+            gsap.to(allTilesInThisPuzzle, {
+              opacity: 0,
+              duration: 0.5,
+              stagger: {
+                each: 0.05,
+                from: "center"
+              },
+              // Remove tiles and show original image
+              onComplete: () => {
+                allTilesInThisPuzzle.forEach(tile => tile.remove());
+
+                gsap.set(sourceImage, {
+                  opacity: 0,
+                  width: '100%',
+                  height: '100%',
+                  scale: 0,
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                })
+
+                gsap.to(sourceImage, {
+                  opacity: 1,
+                  transformOrigin: '50% 50%',
+                  zIndex: 1,
+                  scale: 1,
+                  duration: 0.5,
+                  ease: 'power1.out'
+                })
+              }
+            })
+          }
+        }
+
+      }
+
+    });
+    console.log(`GSAP Draggable initialized for ${tiles.length} tiles.`);
+
+  }
+
+  function handleImageLoad() {
+    if (!sourceImage) {
+      console.error("Source Image not found!");
+      if(loadingMessage) loadingMessage.textContent = "Error: Setup failed.";
+      return;
+    }
+
+    finalImageUrl = sourceImage.currentSrc || sourceImage.src;
+    if (!finalImageUrl) {
+      console.error("Could not determine the final image source URL.");
+      if(loadingMessage) loadingMessage.textContent = "Error: Couldn't get image URL.";
+      return;
+    }
+
+    if (sourceImage.naturalWidth > 0 && sourceImage.naturalHeight > 0) {
+      console.log(`Image loaded successfully: ${sourceImage.naturalWidth}x${sourceImage.naturalHeight}. Final URL: ${finalImageUrl}`);
+      // Call createPuzzle with actual dimensions
+      createPuzzle(sourceImage.naturalWidth, sourceImage.naturalHeight);
+    } else {
+      console.error("image loaded, but dimensions are zero or invalid.");
+      if(loadingMessage) loadingMessage.textContent = "Error: Couldn't get image size.";
+    }
+  }
+
+  if (!container || !sourceImage) {
+    console.error("Puzzle container or source image not found!");
+    if (loadingMessage) loadingMessage.textContent = "Error: Puzzle elements missing.";
+  } else {
+    gridCols = parseInt(container.dataset.cols || '5', 10);
+    gridRows = parseInt(container.dataset.rows || '3', 10);
+
+    if (sourceImage.complete && sourceImage.naturalWidth > 0) {
+      console.log("Image already complete, creating puzzle shortly.");
+      setTimeout(handleImageLoad, 0);
+    } else {
+      console.log("Image not yet loaded, adding event listeners.");
+      sourceImage.onload = handleImageLoad;
+      sourceImage.onerror = () => {
+          // Updated error message slightly
+          console.error("Failed to load puzzle source image element:", sourceImage.id);
+          if(loadingMessage) loadingMessage.textContent = "Error: Failed to load image.";
+          container.style.border = '2px solid red';
+        };
+    }
+  }
+
+
+
+</script>
