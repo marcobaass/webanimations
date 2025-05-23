@@ -41,10 +41,13 @@ const tileClass = `${uniqueId}-tile`; //Unique class for targeting tiles
 
   .puzzle-container {
     position: relative;
-    border: 2px solid #ccc;
+    filter: drop-shadow(2px 2px 4px darkgrey);
     border-radius: 16px;
     overflow: hidden;
     --tileBgUrl: '';
+    flex-shrink: 0;
+    background-color: var(--clr-two);
+    margin-bottom: 5rem;
   }
 
   .source-image{
