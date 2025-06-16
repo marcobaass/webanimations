@@ -25,8 +25,9 @@
     justify-content: space-between;
     padding: 0 3%;
     background-color: var(--clr-two);
-    max-width: 1440px;
+    max-width: 100%;
     border-radius: 50px;
+    z-index: 99;
   }
 
   .menu {
@@ -75,19 +76,19 @@
 <script>
   import { gsap } from "gsap";
 
-  const menu = document.querySelector('.menu');
-  const menuContent = document.querySelector('.menu-content');
-  const highlighter = document.querySelector('.highlighter');
-  const categories = document.querySelectorAll('.category');
+  const menu = document.querySelector<HTMLElement>('.menu')!;
+  const menuContent = document.querySelector<HTMLDivElement>('.menu-content')!;
+  const highlighter = document.querySelector<HTMLDivElement>('.highlighter')!;
+  const categories = document.querySelectorAll<HTMLElement>('.category')!;
 
-  let previousCategory = null;
-  let activeTimeline = null;
+  let previousCategory: (HTMLElement | null) = null;
+  let activeTimeline: (gsap.core.Timeline | gsap.core.Tween | null);
 
-  let movementTimer = null;
-  let latestTargetCategory = null;
+  let movementTimer: (number | null) = null;
+  let latestTargetCategory: (HTMLElement | null) = null;
   const DEBOUNCE_DELAY = 125;
 
-  function executeAnimationLogic(targetCategory) {
+  function executeAnimationLogic(targetCategory: (HTMLElement | null)) {
     if (!targetCategory) {
       console.error("executeAnimationLogic called without a targetCategory!");
       return;
@@ -95,7 +96,11 @@
     if (activeTimeline) {
         activeTimeline.kill();
       }
-      const menuContentRect = menuContent.getBoundingClientRect();
+
+
+      const menuContentRect: DOMRect = menuContent.getBoundingClientRect();
+
+
       const categoryRect = targetCategory.getBoundingClientRect();
 
       const targetLeft = categoryRect.left - menuContentRect.left;
@@ -162,7 +167,9 @@
 
   categories.forEach((category) => {
     category.addEventListener('mouseenter', () => {
-      clearTimeout(movementTimer);
+      if (movementTimer) {
+        clearTimeout(movementTimer);
+      }
 
       latestTargetCategory = category;
 
@@ -176,7 +183,9 @@
     if(activeTimeline) {
       activeTimeline.kill();
     }
-    clearTimeout(movementTimer);
+if (movementTimer) {
+        clearTimeout(movementTimer);
+      }
     activeTimeline = gsap.to(highlighter, { opacity: 0, duration: 0.3, ease: "power2.out",})
     previousCategory = null;
     latestTargetCategory = null;

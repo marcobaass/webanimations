@@ -6,6 +6,8 @@ import Navbar from '../components/Navbar.astro'
 import HeroTextScramble from '../components/HeroTextScramble.astro'
 import ImagePuzzle from '../components/ImagePuzzle.astro';
 import ImagePuzzleText from '../components/ImagePuzzleText.astro';
+import SVGMorph from '../components/SVGMorph.astro';
+import TextHighlighting from '../components/TextHighlighting.astro';
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -27,6 +29,8 @@ import ImagePuzzleText from '../components/ImagePuzzleText.astro';
       <ImagePuzzleText />
       <ImagePuzzle gridCols={5} gridRows={3}/>
     </div>
+    <TextHighlighting />
+    <SVGMorph />
   </main>
 
 </body>
@@ -45,6 +49,8 @@ import ImagePuzzleText from '../components/ImagePuzzleText.astro';
 
   body {
     position: relative;
+    max-width: 1440px;
+    margin: 0 auto;
   }
 
   @keyframes slideUp {
