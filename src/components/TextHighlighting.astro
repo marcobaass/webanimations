@@ -2,21 +2,45 @@
 
 ---
 
-<h2>Turning Vision into Vibrant Reality</h2>
-<h2>It begins with a concept</h2>
-<h2>A foundational blueprint takes shape</h2>
-<h2>Meticulous design refines the idea</h2>
-<h2>Development builds a solid structure</h2>
-<h2>Layer by layer, the idea evolves</h2>
-<h2>Into a seamless, engaging interface</h2>
-<h2>A captivating experience that performs</h2>
+<div id="textWrap">
+  <h2>Turning Vision into Vibrant Reality</h2>
+  <h2>It begins with a concept</h2>
+  <h2>A foundational blueprint takes shape</h2>
+  <h2>Meticulous design refines the idea</h2>
+  <h2>Development builds a solid structure</h2>
+  <h2>Layer by layer, the idea evolves</h2>
+  <h2>Into a seamless, engaging interface</h2>
+  <h2>A captivating experience that performs</h2>
+</div>
 
 <style>
+  #textWrap {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
   h2 {
     color: lightgrey;
+    line-height: 1.5;
   }
 </style>
 
 <script>
-  
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+gsap.registerPlugin(ScrollTrigger);
+
+const textLines: HTMLElement[] = gsap.utils.toArray("h2")
+
+textLines.forEach(line => {
+  gsap.to(line, {
+    color: "black",
+    scrollTrigger: {
+      trigger: line,
+      start: "top 50%",
+      toggleActions: "play none none reverse"
+    }
+  })
+})
+
 </script>

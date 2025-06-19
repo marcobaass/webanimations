@@ -8,6 +8,7 @@ import ImagePuzzle from '../components/ImagePuzzle.astro';
 import ImagePuzzleText from '../components/ImagePuzzleText.astro';
 import SVGMorph from '../components/SVGMorph.astro';
 import TextHighlighting from '../components/TextHighlighting.astro';
+import Footer from '../components/Footer.astro';
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -23,15 +24,23 @@ import TextHighlighting from '../components/TextHighlighting.astro';
   <header>
   </header>
 
-  <main>
-    <HeroTextScramble />
-    <div id="puzzle">
-      <ImagePuzzleText />
-      <ImagePuzzle gridCols={5} gridRows={3}/>
+  <main id="site-main">
+    <div class="main-wrapper">
+      <HeroTextScramble />
+      <div id="puzzle">
+        <ImagePuzzleText />
+        <ImagePuzzle gridCols={5} gridRows={3}/>
+      </div>
+      <TextHighlighting />
+      <SVGMorph />
     </div>
-    <TextHighlighting />
-    <SVGMorph />
   </main>
+  <div id="scroll-space">
+
+  </div>
+  <footer id="site-footer">
+    <Footer />
+  </footer>
 
 </body>
 
@@ -49,8 +58,29 @@ import TextHighlighting from '../components/TextHighlighting.astro';
 
   body {
     position: relative;
-    max-width: 1440px;
+  }
+
+
+  #site-main {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    border-radius: 0 0 5rem 5rem; /* same radius as height in footer */
+    background-color: white;
+  }
+
+  .main-wrapper {
     margin: 0 auto;
+    max-width: 1440px;
+  }
+
+  #site-footer {
+    position: fixed;
+    margin-top: 6rem;
+    width: 100%;
+    bottom: 0;
+    left:0;
+    z-index: 1;
   }
 
   @keyframes slideUp {
@@ -70,3 +100,19 @@ import TextHighlighting from '../components/TextHighlighting.astro';
     gap: var(--space-2xl)
   }
 </style>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+  gsap.registerPlugin(ScrollTrigger);
+
+  const footer = document.querySelector(".footer") as HTMLElement;
+  const scrollSpace = document.getElementById('scroll-space')
+  const footerHeight = footer.offsetHeight;
+  console.log("footerheight: ", footerHeight);
+
+
+  gsap.set(scrollSpace, {
+    height: footerHeight
+  })
+</script>
