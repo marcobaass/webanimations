@@ -49,6 +49,7 @@
     width: 100%;
     height:auto;
     display: block;
+    padding: 5rem;
   }
 
   #gear, #gearLeft, #gearRight {
@@ -61,10 +62,9 @@
   import { gsap } from "gsap";
   import { MorphSVGPlugin } from 'gsap/MorphSVGPlugin';
   import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
-  import { ScrollTrigger } from "gsap/ScrollTrigger";
-  gsap.registerPlugin(MorphSVGPlugin, DrawSVGPlugin, ScrollTrigger);
+  gsap.registerPlugin(MorphSVGPlugin, DrawSVGPlugin);
 
-  console.log("plugin: ", DrawSVGPlugin)
+  
 
 
 
@@ -73,7 +73,6 @@
       trigger: "#gearmorph",
       start: "top 30%",
       toggleActions: "play none none none",
-      once: true,
       scrub: 1,
       pin: true,
       end: "+=2800"

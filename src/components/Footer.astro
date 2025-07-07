@@ -5,7 +5,36 @@
   <div class="extra-space"></div>
   <div class="footer">
     <div class="footer-content">
-      <h1>Lorem ipsum dolor sit amet consectetur</h1>
+      <h1>AN<span class="eye">I</span>WEB</h1>
+      <div class="locations">
+        <div>
+          <p class="cities">New York</p>
+          <p>122 Jackson Street</p>
+          <p>Brooklyn, NY 11211</p>
+        </div>
+        <div>
+          <p class="cities">Buenos Aires</p>
+          <p>Malabia 1720</p>
+          <p>Palermo, C1425CLH</p>
+        </div>
+        <div>
+          <p class="cities">Brussels</p>
+          <p>Rue Haute 13</p>
+          <p>1000 Bruxelles</p>
+        </div>
+        <div>
+          <p class="cities">Berlin</p>
+          <p>Torstraße 66</p>
+          <p>10119 Berlin</p>
+        </div>
+        <div>
+          <p class="cities">Socials</p>
+          <p>Instagram</p>
+          <p>LinkedIn</p>
+          <p>Vimeo</p>
+          <p>TikTok</p>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -20,10 +49,39 @@
     width: 100%;
     background-color: black;
     color: white;
+    padding-bottom: 2.75em;
   }
 
   .footer-content {
     max-width: 1240px;
     margin: 0 auto;
   }
+
+  h1 {
+    display: flex;
+    align-items: center;
+    line-height: 2.75;
+    margin-top: 6rem;
+  }
+
+  .eye {
+    font-size: 1.25em;
+    transform: scaleX(0.85);
+  }
+
+  .locations {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  p {
+    color: lightgrey;
+  }
+
+  .cities {
+    color: white;
+    font-weight: 600;
+    margin-bottom: 1em;
+  }
+
 </style>

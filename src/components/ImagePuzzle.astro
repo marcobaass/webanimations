@@ -135,16 +135,9 @@ const tileClass = `${uniqueId}-tile`; //Unique class for targeting tiles
     container.style.width = `${imgWidth}px`;
     container.style.height = `${imgHeight}px`
 
-    // container.style.setProperty('--tileBgUrl', `url(${finalImageUrl})`);
-
-    console.log(`Container size set to ${imgWidth}x${imgHeight}`);
-    console.log(`Using image URL for tiles: ${finalImageUrl}`);
-
     const tileWidth = imgWidth / gridCols;
     const tileHeight = imgHeight / gridRows;
     const totalTiles = gridCols * gridRows;
-
-    console.log(`Tile dimensions: ${tileWidth}x${tileHeight}, Total tiles: ${totalTiles}`);
 
     const tiles = [];
 
@@ -175,10 +168,9 @@ const tileClass = `${uniqueId}-tile`; //Unique class for targeting tiles
       tile.style.left = '0px';
 
       // Calculate Random Position within bounds
-      console.log(`Calculating randomY: imgHeight=${imgHeight}, tileHeight=${tileHeight}`);
       const randomX = Math.random() * (imgWidth - tileWidth);
       const randomY = Math.random() * (imgHeight - tileHeight);
-      console.log(`Calculated randomX=${randomX}, randomY=${randomY}`);
+
 
       container.appendChild(tile);
       tiles.push(tile);
@@ -210,7 +202,7 @@ const tileClass = `${uniqueId}-tile`; //Unique class for targeting tiles
           points.push(point);
         }
       }
-      console.log("Generated Snap Points:", points)
+
       return points;
     }
 
@@ -251,10 +243,10 @@ const tileClass = `${uniqueId}-tile`; //Unique class for targeting tiles
           this.target.style.zIndex = 0;
           this.target.classList.add('correct-place');
           correctPlacements ++;
-          console.log(correctPlacements);
+
           // when puzzle completed
           if (correctPlacements === gridCols * gridRows) {
-            console.log('complete');
+
 
             // collecting puzzles of THIS puzzle instance
             const allTilesInThisPuzzle = container?.querySelectorAll(`.${tileClassName}`);
@@ -302,7 +294,7 @@ const tileClass = `${uniqueId}-tile`; //Unique class for targeting tiles
       }
 
     });
-    console.log(`GSAP Draggable initialized for ${tiles.length} tiles.`);
+
 
   }
 
@@ -321,7 +313,7 @@ const tileClass = `${uniqueId}-tile`; //Unique class for targeting tiles
     }
 
     if (sourceImage.naturalWidth > 0 && sourceImage.naturalHeight > 0) {
-      console.log(`Image loaded successfully: ${sourceImage.naturalWidth}x${sourceImage.naturalHeight}. Final URL: ${finalImageUrl}`);
+
       // Call createPuzzle with actual dimensions
       createPuzzle(sourceImage.naturalWidth, sourceImage.naturalHeight);
     } else {
@@ -338,10 +330,10 @@ const tileClass = `${uniqueId}-tile`; //Unique class for targeting tiles
     gridRows = parseInt(container.dataset.rows || '3', 10);
 
     if (sourceImage.complete && sourceImage.naturalWidth > 0) {
-      console.log("Image already complete, creating puzzle shortly.");
+
       setTimeout(handleImageLoad, 0);
     } else {
-      console.log("Image not yet loaded, adding event listeners.");
+      
       sourceImage.onload = handleImageLoad;
       sourceImage.onerror = () => {
           // Updated error message slightly

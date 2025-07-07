@@ -1,0 +1,72 @@
+<div id="cursorFollower">
+  <div id="cursorDot">
+
+  </div>
+</div>
+
+<style>
+  #cursorFollower {
+    visibility: hidden;
+    position: fixed;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 3px solid var(--clr-one);
+    pointer-events: none;
+  }
+
+  #cursorDot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid var(--clr-one);
+    background-color: var(--clr-one);
+  }
+</style>
+
+<script>
+  import { gsap } from "gsap";
+
+  let mouseX: number = 0
+  let mouseY: number = 0
+  let followerX: number = 0
+  let followerY: number = 0
+  let hasMouseMoved = false
+  const follower = document.getElementById('cursorFollower')
+
+  gsap.set(follower, {
+    xPercent: -50,
+    yPercent: -50,
+    autoAlpha: 0
+  })
+
+  function animateFollower() {
+    followerX = followerX + ((mouseX - followerX) / 10)
+    followerY = followerY + ((mouseY - followerY) / 10)
+    gsap.set(follower, {
+      x: followerX,
+      y: followerY
+    })
+    requestAnimationFrame(animateFollower)
+  }
+
+  document.addEventListener('mousemove', (e) =>{
+    mouseX = e.clientX
+    mouseY = e.clientY
+
+    if(!hasMouseMoved) {
+      hasMouseMoved = true
+      followerX = mouseX
+      followerY = mouseY
+      gsap.to(follower, {
+        autoAlpha: 1,
+        duration: 2
+      })
+      animateFollower()
+    }
+  })
+</script>

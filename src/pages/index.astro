@@ -9,6 +9,7 @@ import ImagePuzzleText from '../components/ImagePuzzleText.astro';
 import SVGMorph from '../components/SVGMorph.astro';
 import TextHighlighting from '../components/TextHighlighting.astro';
 import Footer from '../components/Footer.astro';
+import CursorFollower from '../components/CursorFollower.astro';
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -19,6 +20,7 @@ import Footer from '../components/Footer.astro';
 </head>
 
 <body>
+  <CursorFollower />
   <div class="page-transition"></div>
   <Navbar />
   <header>
@@ -42,6 +44,8 @@ import Footer from '../components/Footer.astro';
     <Footer />
   </footer>
 
+  <script src="../scripts/lenis.js"></script>
+
 </body>
 
 </html>
@@ -59,7 +63,6 @@ import Footer from '../components/Footer.astro';
   body {
     position: relative;
   }
-
 
   #site-main {
     position: relative;
@@ -104,12 +107,11 @@ import Footer from '../components/Footer.astro';
 <script>
   import { gsap } from "gsap";
   import { ScrollTrigger } from "gsap/ScrollTrigger";
-  gsap.registerPlugin(ScrollTrigger);
+  // gsap.registerPlugin(ScrollTrigger);
 
   const footer = document.querySelector(".footer") as HTMLElement;
   const scrollSpace = document.getElementById('scroll-space')
   const footerHeight = footer.offsetHeight;
-  console.log("footerheight: ", footerHeight);
 
 
   gsap.set(scrollSpace, {

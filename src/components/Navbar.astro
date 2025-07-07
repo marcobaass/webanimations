@@ -3,7 +3,7 @@
 ---
 
 <nav>
-  <h2>Web Animations</h2>
+  <h2>AN<span class="eye">I</span>WEB</h2>
   <div class="menu">
     <div class="highlighter"></div>
     <div class="menu-content">
@@ -48,6 +48,17 @@
     cursor: pointer;
     position: relative;
     transition: color 0.2s ease;
+  }
+
+  h2 {
+    display: flex;
+    align-items: center;
+    font-weight: 900;
+  }
+
+  .eye {
+    font-size: 1.25em;
+    transform: scaleX(0.85);
   }
 
   h3.category  {
@@ -108,7 +119,7 @@
       const targetHeight = categoryRect.height;
       const targetTop = categoryRect.top - menuContentRect.top;
 
-      console.log("Target Left:", targetLeft, "Target Width:", targetWidth);
+      
 
       gsap.set(highlighter, {
         top: targetTop,
