@@ -7,7 +7,6 @@ import { MorphSVGPlugin } from 'gsap/MorphSVGPlugin';
 import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
 gsap.registerPlugin(ScrollTrigger, MorphSVGPlugin, DrawSVGPlugin);
 
-
 // --- Debugging
 console.log("Global GSAP instance (from lenis.js):", gsap);
 console.log("Is ScrollTrigger registered globally?", !!gsap.plugins.scrollTrigger);
@@ -42,5 +41,6 @@ ScrollTrigger.defaults({
   scroller: document.documentElement
 });
 
+window.lenis = lenis;
 
 console.log("Lenis and GSAP ScrollTrigger initialized globally!");

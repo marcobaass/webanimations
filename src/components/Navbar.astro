@@ -7,10 +7,18 @@
   <div class="menu">
     <div class="highlighter"></div>
     <div class="menu-content">
-      <h3 class="category">Home</h3>
-      <h3 class="category">Puzzle</h3>
-      <h3 class="category">Inspiration</h3>
-      <h3 class="category">Contact</h3>
+      <a href="/">
+        <h3 class="category">Home</h3>
+      </a>
+      <a href="#puzzle">
+        <h3 class="category">Puzzle</h3>
+      </a>
+      <a href="#textWrap">
+        <h3 class="category">Vision</h3>
+      </a>
+      <a href="#footer">
+        <h3 class="category">Contact</h3>
+      </a>
     </div>
   </div>
 </nav>
@@ -19,7 +27,7 @@
   nav {
     position: sticky;
     top: 0.75rem;
-    margin: 0 auto;
+    margin: 0 0.75rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -81,6 +89,8 @@
     z-index: 0;
     pointer-events: none;
   }
+
+
 
 </style>
 

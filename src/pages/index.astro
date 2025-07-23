@@ -29,7 +29,7 @@ import CursorFollower from '../components/CursorFollower.astro';
   <main id="site-main">
     <div class="main-wrapper">
       <HeroTextScramble />
-      <div id="puzzle">
+      <div id="puzzle" class="target-section">
         <ImagePuzzleText />
         <ImagePuzzle gridCols={5} gridRows={3}/>
       </div>
@@ -45,6 +45,86 @@ import CursorFollower from '../components/CursorFollower.astro';
   </footer>
 
   <script src="../scripts/lenis.js"></script>
+
+  <script>
+  // This function will run once the entire HTML document is loaded.
+  document.addEventListener('DOMContentLoaded', () => {
+
+    // We add a tiny delay (100ms) to ensure Lenis is fully initialized and
+    // assigned to `window.lenis` before we try to use it.
+    setTimeout(() => {
+
+      // Try to get the Lenis instance that we exposed to the window object.
+      const lenis = window.lenis;
+
+      // A quick check to make sure Lenis was found. If not, something is wrong
+      // with Prep Step A, and the smooth scroll with offset won't work.
+      if (!lenis) {
+        console.warn("Lenis instance not found. Anchor scrolling will use browser default.");
+        return; // Stop this script from running further if Lenis isn't available.
+      }
+
+      // Find ALL <a> (anchor) tags whose 'href' attribute starts with a '#' symbol.
+      // These are typically your internal page links.
+      document.querySelectorAll('a[href^="#"]').forEach(anchorLink => {
+
+        // For each of these anchor links, add an event listener for when they are clicked.
+        anchorLink.addEventListener('click', function (event) {
+
+          // Get the value of the 'href' attribute (e.g., "#puzzle").
+          const targetId = this.getAttribute('href');
+
+          // Make sure the href is actually an ID and not just a standalone '#' (which is common for empty links).
+          if (targetId && targetId !== '#') {
+
+            // *** CRUCIAL STEP: Prevent the browser's default jump behavior! ***
+            // If we don't do this, the browser will jump instantly, and Lenis won't get a chance.
+            event.preventDefault();
+
+            if (targetId === '#footer') {
+              // Instead of trying to scroll to the fixed footer,
+              // scroll to the very bottom of the document
+              lenis.scrollTo('bottom', {
+                duration: 1.2,
+                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+              });
+              return;
+            }
+
+            // Find the actual HTML element on the page that has the ID specified in the link.
+            // For example, if targetId is "#puzzle", this finds <div id="puzzle">.
+            const targetElement = document.querySelector(targetId);
+
+            // If the target element was successfully found...
+            if (targetElement) {
+              // Define how many pixels *above* the target element you want to stop scrolling.
+              // For example, if you have a 80px tall fixed header, setting this to 80
+              // will make the target stop 80px below the top of the viewport.
+              const desiredOffsetPixels = 100; // Adjust this value (in pixels) as needed!
+
+              // Tell the Lenis instance to scroll to our target element.
+              lenis.scrollTo(targetElement, {
+                // The 'offset' in Lenis is tricky:
+                //   - A positive offset means scroll PAST the target.
+                //   - A NEGATIVE offset means scroll *BEFORE* the target.
+                // We want to stop *before* the target by 'desiredOffsetPixels',
+                // so the target appears 'desiredOffsetPixels' from the top.
+                offset: -desiredOffsetPixels,
+
+                duration: 1.2, // How long the scroll animation should take in seconds (e.g., 1.2s).
+
+                // This is an easing function for a smoother animation.
+                // You can experiment with different easing functions if you like.
+                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+              });
+            }
+          }
+        });
+      });
+
+    }, 100); // The setTimeout ends here.
+  }); // The DOMContentLoaded listener ends here.
+</script>
 
 </body>
 
