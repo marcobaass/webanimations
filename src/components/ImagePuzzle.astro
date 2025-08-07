@@ -48,6 +48,12 @@ const tileClass = `${uniqueId}-tile`; //Unique class for targeting tiles
     flex-shrink: 0;
     background-color: var(--clr-two);
     margin-bottom: 5rem;
+    margin-left: auto;
+    margin-right: auto;
+    width: 90%;
+    max-width: 750px;
+    aspect-ratio: 3 / 2;
+    height: auto;
   }
 
   .source-image{
@@ -98,6 +104,8 @@ const tileClass = `${uniqueId}-tile`; //Unique class for targeting tiles
 
 </style>
 
+
+
 <script>
 
   import { gsap } from "gsap";
@@ -119,7 +127,7 @@ const tileClass = `${uniqueId}-tile`; //Unique class for targeting tiles
   let finalImageUrl: string = '';
 
   //Creating puzzle tiles
-  function createPuzzle(imgWidth: number, imgHeight: number) {
+  function createPuzzle() {
 
     if (!container || !finalImageUrl || !tileClassName) {
       console.error('Container, image URL, or tile class name missing!');
@@ -132,11 +140,11 @@ const tileClass = `${uniqueId}-tile`; //Unique class for targeting tiles
 
     container.querySelectorAll(`.${tileClassName}`).forEach(tile => tile.remove());
 
-    container.style.width = `${imgWidth}px`;
-    container.style.height = `${imgHeight}px`
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
 
-    const tileWidth = imgWidth / gridCols;
-    const tileHeight = imgHeight / gridRows;
+    const tileWidth = containerWidth / gridCols;
+    const tileHeight = containerHeight / gridRows;
     const totalTiles = gridCols * gridRows;
 
     const tiles = [];
@@ -158,7 +166,7 @@ const tileClass = `${uniqueId}-tile`; //Unique class for targeting tiles
       // Set tile visual styles
       tile.style.width = `${tileWidth}px`;
       tile.style.height = `${tileHeight}px`;
-      tile.style.backgroundSize = `${imgWidth}px ${imgHeight}px`;
+      tile.style.backgroundSize = `${containerWidth}px ${containerHeight}px`;
       tile.style.backgroundPosition = `${bgPosX}px ${bgPosY}px`;
       tile.style.backgroundImage = `url(${finalImageUrl})`;
 
@@ -168,8 +176,8 @@ const tileClass = `${uniqueId}-tile`; //Unique class for targeting tiles
       tile.style.left = '0px';
 
       // Calculate Random Position within bounds
-      const randomX = Math.random() * (imgWidth - tileWidth);
-      const randomY = Math.random() * (imgHeight - tileHeight);
+      const randomX = Math.random() * (containerWidth - tileWidth);
+      const randomY = Math.random() * (containerHeight - tileHeight);
 
 
       container.appendChild(tile);
@@ -312,16 +320,30 @@ const tileClass = `${uniqueId}-tile`; //Unique class for targeting tiles
       return;
     }
 
+    // Call createPuzzle without any arguments
     if (sourceImage.naturalWidth > 0 && sourceImage.naturalHeight > 0) {
-
-      // Call createPuzzle with actual dimensions
-      createPuzzle(sourceImage.naturalWidth, sourceImage.naturalHeight);
+      createPuzzle();
     } else {
       console.error("image loaded, but dimensions are zero or invalid.");
       if(loadingMessage) loadingMessage.textContent = "Error: Couldn't get image size.";
+     }
+  }
+
+  // --- Resize handler with debounce ---
+  function handleResize() {
+    if (container) {
+      // Recalculate and rebuild the puzzle tiles
+      createPuzzle();
     }
   }
 
+  let resizeTimeout;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(handleResize, 250); // Debounce
+  });
+
+  // --- 4. Initial setup and event listeners ---
   if (!container || !sourceImage) {
     console.error("Puzzle container or source image not found!");
     if (loadingMessage) loadingMessage.textContent = "Error: Puzzle elements missing.";
@@ -330,20 +352,16 @@ const tileClass = `${uniqueId}-tile`; //Unique class for targeting tiles
     gridRows = parseInt(container.dataset.rows || '3', 10);
 
     if (sourceImage.complete && sourceImage.naturalWidth > 0) {
-
-      setTimeout(handleImageLoad, 0);
+      // Initial setup
+      handleImageLoad();
     } else {
-
+      // If not complete, wait for the image to load
       sourceImage.onload = handleImageLoad;
       sourceImage.onerror = () => {
-          // Updated error message slightly
           console.error("Failed to load puzzle source image element:", sourceImage.id);
           if(loadingMessage) loadingMessage.textContent = "Error: Failed to load image.";
           container.style.border = '2px solid red';
         };
     }
   }
-
-
-
 </script>

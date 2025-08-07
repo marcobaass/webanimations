@@ -4,6 +4,14 @@
 
 <nav>
   <h2>AN<span class="eye">I</span>WEB</h2>
+
+  <!-- Hamburger Menu Button -->
+  <button class="hamburger" aria-label="Toggle menu">
+    <span class="hamburger-line"></span>
+    <span class="hamburger-line"></span>
+    <span class="hamburger-line"></span>
+  </button>
+
   <div class="menu">
     <div class="highlighter"></div>
     <div class="menu-content">
@@ -69,7 +77,7 @@
     transform: scaleX(0.85);
   }
 
-  h3.category  {
+  h3.category {
     line-height: 1;
   }
 
@@ -81,7 +89,6 @@
     position: absolute;
     top: 0;
     left: 0;
-    /* height: 100%; */
     width: 0;
     background-color: var(--clr-one);
     border-radius: 50px;
@@ -90,8 +97,102 @@
     pointer-events: none;
   }
 
+  /* Hamburger Menu Styles */
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 24px;
+    height: 18px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 100;
+    margin-right: 12px;
+  }
 
+  .hamburger-line {
+    width: 100%;
+    height: 2px;
+    background-color: currentColor;
+    transition: all 0.3s ease;
+    transform-origin: center;
+  }
 
+  .hamburger.active .hamburger-line:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+  }
+
+  .hamburger.active .hamburger-line:nth-child(2) {
+    opacity: 0;
+  }
+
+  .hamburger.active .hamburger-line:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -6px);
+  }
+
+  /* Mobile Styles */
+  @media (max-width: 1024px) {
+    .hamburger {
+      display: flex;
+    }
+
+    .menu {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 300px;
+      height: 100vh;
+      background-color: var(--clr-two);
+      transition: right 0.3s ease;
+      z-index: 98;
+      padding-top: 5rem;
+    }
+
+    .menu.active {
+      right: 0;
+    }
+
+    .menu-content {
+      flex-direction: column;
+      gap: 1.5em;
+      padding: 2rem;
+      align-items: flex-start;
+    }
+
+    .category {
+      padding: 0.5em 1em;
+      width: 100%;
+      text-align: left;
+      border-radius: 8px;
+      transition: background-color 0.2s ease;
+    }
+
+    .category:hover {
+      background-color: var(--clr-one);
+      color: rgb(38, 38, 38);
+    }
+
+    .highlighter {
+      display: none;
+    }
+
+    .menu.active::before {
+      left: 0;
+    }
+  }
+
+  @media (max-width: 768px) {
+    nav {
+      margin: 0 0.5rem;
+      padding: 0 2%;
+    }
+
+    .menu {
+      width: 280px;
+    }
+  }
 </style>
 
 <script>
@@ -101,6 +202,7 @@
   const menuContent = document.querySelector<HTMLDivElement>('.menu-content')!;
   const highlighter = document.querySelector<HTMLDivElement>('.highlighter')!;
   const categories = document.querySelectorAll<HTMLElement>('.category')!;
+  const hamburger = document.querySelector<HTMLButtonElement>('.hamburger')!;
 
   let previousCategory: (HTMLElement | null) = null;
   let activeTimeline: (gsap.core.Timeline | gsap.core.Tween | null);
@@ -109,85 +211,129 @@
   let latestTargetCategory: (HTMLElement | null) = null;
   const DEBOUNCE_DELAY = 125;
 
+  // Hamburger menu toggle
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('active');
+    menu.classList.toggle('active');
+
+    // Prevent body scroll when menu is open
+    if (menu.classList.contains('active')) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  });
+
+  // Close menu when clicking on overlay or menu items
+  menu.addEventListener('click', (e) => {
+    if (e.target === menu || e.target instanceof HTMLAnchorElement) {
+      hamburger.classList.remove('active');
+      menu.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+  });
+
+  // Close menu on escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && menu.classList.contains('active')) {
+      hamburger.classList.remove('active');
+      menu.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+  });
+
+  // Handle window resize
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 1024) {
+      hamburger.classList.remove('active');
+      menu.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+  });
+
   function executeAnimationLogic(targetCategory: (HTMLElement | null)) {
+    // Skip animation on mobile
+    if (window.innerWidth <= 1024) {
+      return;
+    }
+
     if (!targetCategory) {
       console.error("executeAnimationLogic called without a targetCategory!");
       return;
     }
+
     if (activeTimeline) {
-        activeTimeline.kill();
-      }
+      activeTimeline.kill();
+    }
 
+    const menuContentRect: DOMRect = menuContent.getBoundingClientRect();
+    const categoryRect = targetCategory.getBoundingClientRect();
 
-      const menuContentRect: DOMRect = menuContent.getBoundingClientRect();
+    const targetLeft = categoryRect.left - menuContentRect.left;
+    const targetWidth = categoryRect.width;
+    const targetHeight = categoryRect.height;
+    const targetTop = categoryRect.top - menuContentRect.top;
 
+    gsap.set(highlighter, {
+      top: targetTop,
+      height: targetHeight
+    });
 
-      const categoryRect = targetCategory.getBoundingClientRect();
+    activeTimeline = gsap.timeline();
 
-      const targetLeft = categoryRect.left - menuContentRect.left;
-      const targetWidth = categoryRect.width;
-      const targetHeight = categoryRect.height;
-      const targetTop = categoryRect.top - menuContentRect.top;
-
-
-
+    if (gsap.getProperty(highlighter, "opacity") == 0) {
       gsap.set(highlighter, {
-        top: targetTop,
-        height: targetHeight
-      });
+        left: targetLeft,
+        width: targetWidth,
+      })
 
-      activeTimeline = gsap.timeline();
+      activeTimeline.to(highlighter, {
+        opacity: 1,
+        duration: 0.2,
+      })
+    } else {
+      if (previousCategory !== targetCategory && previousCategory) {
+        const prevCategoryRect = previousCategory.getBoundingClientRect();
+        const prevLeftRelative = prevCategoryRect.left - menuContentRect.left;
+        const prevWidth = prevCategoryRect.width;
+        const expandLeft = Math.min(targetLeft, prevLeftRelative);
+        const expandRight = Math.max((targetLeft + targetWidth), (prevLeftRelative + prevWidth));
+        const expandWidth = expandRight - expandLeft;
 
-      if (gsap.getProperty(highlighter, "opacity") == 0) {
-
-        gsap.set(highlighter, {
-          left: targetLeft,
-          width: targetWidth,
-        })
-
-        activeTimeline.to(highlighter, {
-          opacity: 1,
-          duration: 0.2,
-        })
-
+        activeTimeline
+          .to(highlighter, {
+            left: expandLeft,
+            width: expandWidth,
+            duration: 0.2,
+            ease: "power2.inOut"
+          })
+          .to(highlighter, {
+            left: targetLeft,
+            width: targetWidth,
+            duration: 0.2,
+            ease: "power2.inOut"
+          })
       } else {
-        if (previousCategory !== targetCategory && previousCategory) {
-          const prevCategoryRect = previousCategory.getBoundingClientRect();
-          const prevLeftRelative = prevCategoryRect.left - menuContentRect.left;
-          const prevWidth = prevCategoryRect.width;
-          const expandLeft = Math.min(targetLeft, prevLeftRelative);
-          const expandRight = Math.max((targetLeft + targetWidth), (prevLeftRelative + prevWidth));
-          const expandWidth = expandRight - expandLeft;
-
-          activeTimeline
-            .to(highlighter, {
-              left: expandLeft,
-              width: expandWidth,
-              duration: 0.2,
-              ease: "power2.inOut"
-            })
-            .to(highlighter, {
-              left: targetLeft,
-              width: targetWidth,
-              duration: 0.2,
-              ease: "power2.inOut"
-            })
-        } else {
-          activeTimeline
-            .to(highlighter, {
-              left: targetLeft,
-              width: targetWidth,
-              opacity: 1,
-              duration: 0.2,
-              ease: "power2.inOut"
-            })
-        }
+        activeTimeline
+          .to(highlighter, {
+            left: targetLeft,
+            width: targetWidth,
+            opacity: 1,
+            duration: 0.2,
+            ease: "power2.inOut"
+          })
       }
-      previousCategory = targetCategory;
+    }
+    previousCategory = targetCategory;
   }
 
   categories.forEach((category) => {
     category.addEventListener('mouseenter', () => {
+      // Skip hover effects on mobile
+      if (window.innerWidth <= 1024) {
+        return;
+      }
+
       if (movementTimer) {
         clearTimeout(movementTimer);
       }
@@ -201,13 +347,25 @@
   })
 
   menu.addEventListener('mouseleave', () => {
-    if(activeTimeline) {
+    // Skip hover effects on mobile
+    if (window.innerWidth <= 1024) {
+      return;
+    }
+
+    if (activeTimeline) {
       activeTimeline.kill();
     }
-if (movementTimer) {
-        clearTimeout(movementTimer);
-      }
-    activeTimeline = gsap.to(highlighter, { opacity: 0, duration: 0.3, ease: "power2.out",})
+
+    if (movementTimer) {
+      clearTimeout(movementTimer);
+    }
+
+    activeTimeline = gsap.to(highlighter, {
+      opacity: 0,
+      duration: 0.3,
+      ease: "power2.out",
+    })
+
     previousCategory = null;
     latestTargetCategory = null;
   })
