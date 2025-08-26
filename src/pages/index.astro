@@ -22,11 +22,11 @@ import CursorFollower from '../components/CursorFollower.astro';
 <body>
   <CursorFollower />
   <div class="page-transition"></div>
-  <Navbar />
   <header>
   </header>
 
   <main id="site-main">
+    <Navbar />
     <div class="main-wrapper">
       <HeroTextScramble />
       <div id="puzzle" class="target-section">
@@ -132,16 +132,28 @@ import CursorFollower from '../components/CursorFollower.astro';
 
 <style>
 
+  html {
+    /* background: red; */
+  }
+
   body {
     position: relative;
   }
 
+  /* --clr-one: #F2C9E0;
+  --clr-one: #eefc2e;
+  --clr-two: #8FBDD9;
+  --clr-three: #8C6E37;
+  --clr-four: #8C2920;
+  --clr-accent: #D93636; */
+
   #site-main {
+    background: white;
     position: relative;
+    background: radial-gradient(circle, #F2C9E0 0%, #8FBDD9 100%);
     z-index: 2;
     width: 100%;
     border-radius: 0 0 50px 50px; /* same radius as height in footer */
-    background-color: white;
   }
 
   .main-wrapper {

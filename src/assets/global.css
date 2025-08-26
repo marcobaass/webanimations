@@ -31,7 +31,7 @@
   --space-3xl: clamp(6.75rem, 6.4891rem + 1.3043vw, 7.5rem);
 
   /*Colors*/
-  /* --clr-one: #F2C9E0; */
+  --clr-five: #F2C9E0;
   --clr-one: #eefc2e;
   --clr-two: #8FBDD9;
   --clr-three: #8C6E37;

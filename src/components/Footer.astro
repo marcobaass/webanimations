@@ -29,10 +29,10 @@
         </div>
         <div>
           <p class="cities">Socials</p>
-          <p>Instagram</p>
-          <p>LinkedIn</p>
-          <p>Vimeo</p>
-          <p>TikTok</p>
+          <a href="#"><p>Instagram</p></a>
+          <a href="#"><p>LinkedIn</p></a>
+          <a href="#"><p>Vimeo</p></a>
+          <a href="#"><p>TikTok</p></a>
         </div>
       </div>
     </div>
@@ -55,13 +55,14 @@
   .footer-content {
     max-width: 1240px;
     margin: 0 auto;
+    padding: 5% 5%;
   }
 
   h1 {
     display: flex;
     align-items: center;
     line-height: 2.75;
-    margin-top: 6rem;
+    /* margin-top: 6rem; */
     color: var(--clr-one);
   }
 
@@ -73,6 +74,9 @@
   .locations {
     display: flex;
     justify-content: space-between;
+    gap: 1em;
+    flex-wrap: wrap;
+    row-gap: 2em;
   }
 
   p {
@@ -83,6 +87,10 @@
     color: white;
     font-weight: 600;
     margin-bottom: 1em;
+  }
+
+  a:hover p {
+    color: var(--clr-one);
   }
 
 </style>

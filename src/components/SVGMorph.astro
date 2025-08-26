@@ -23,11 +23,13 @@
             <path d="M312.579,333.579C342.118,309.973 356.079,279.304 352.895,241.551C348.094,184.796 297.541,143.28 240.57,148.512C179.484,154.111 136.475,212.492 149.26,272.314C165.131,346.462 250.612,378.733 312.579,333.579Z" style="fill:#fff;fill-rule:nonzero;"/>
         </g>
     </g>
+
+
     <g id="blueprint" transform="matrix(1,0,0,1,352.333,32.0696)">
         <path id="blueprintFrame" d="M349.611,41.027L115.129,41.027C97.253,41.027 94.744,57.792 94.499,59.897L93.436,250.138L93.436,435.386C93.436,451.897 106.758,456.331 109.551,457.079L388.774,457.079C396.061,457.079 399.877,452.073 402.066,447.337C404.399,442.279 405.028,437.228 405.142,436.127L405.142,97.548L349.611,41.027" style="fill:none;fill-rule:nonzero;stroke:#0008ff;stroke-width:15px;"/>
     </g>
     <g id="blueprint2" transform="matrix(1,0,0,1,352.333,32.0696)">
-        <path id="blueprintCorner" d="M340.689,42.682L341.208,83.142C341.208,83.142 341.172,99.527 360.722,99.527C380.272,99.527 400.5,100.311 400.5,100.311" style="fill:#5fc4ff;fill-rule:nonzero;stroke:#0008ff;stroke-width:15px;stroke-linecap:butt;"/>
+        <path id="blueprintCorner" d="M340.689,42.682L341.208,83.142C341.208,83.142 341.172,99.527 360.722,99.527C380.272,99.527 400.5,100.311 400.5,100.311" style="fill:none;fill-rule:nonzero;stroke:#0008ff;stroke-width:15px;stroke-linecap:butt;"/>
     </g>
     <g id="blueprint3" transform="matrix(1,0,0,1,352.333,32.0696)">
         <path id="blueprintGearShape" d="M170.497,194.751L191.792,173.455L212.023,187.298L230.124,177.713L233.317,156.419L264.195,156.419L266.325,178.779L286.555,187.298L307.851,172.391L327.016,192.62L313.175,215.779L320.629,230.951L343.822,237.104C345.179,243.681 345.419,253.124 343.938,268.218L319.563,270.349L311.046,287.385L328.082,309.744L307.614,330.212L286.636,315.069L267.39,325.717L263.13,347.011L235.448,348.076L230.124,325.717L213.086,316.134L191.792,331.041L171.561,310.81L184.339,288.448L176.885,269.283L152.396,265.025L152.396,237.341L176.885,233.081L184.339,211.787L170.497,194.751Z" style="fill:#5fc4ff;fill-rule:nonzero;stroke:#0008ff;stroke-width:14.11px;stroke-linecap:butt;"/>
@@ -41,15 +43,15 @@
 
 <style>
   #gearmorph {
-    max-width: 50%;
-    margin: 0 auto;
+    max-width: 70%;
+    margin: 0 auto 0;
   }
 
   #gearmorph svg {
     width: 100%;
     height:auto;
     display: block;
-    padding: 5rem;
+    padding-bottom: 10%;
   }
 
   #gear, #gearLeft, #gearRight {
@@ -64,25 +66,23 @@
   import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
   gsap.registerPlugin(MorphSVGPlugin, DrawSVGPlugin);
 
-  
-
-
 
   let tl = gsap.timeline({
     scrollTrigger: {
       trigger: "#gearmorph",
-      start: "top 30%",
+      start: "top 15%",
       toggleActions: "play none none none",
       scrub: 1,
       pin: true,
-      end: "+=2800"
+      end: () => `+=${window.innerHeight * 1.5}`,
+      invalidateOnRefresh: true,
     }
   });
 
 
   tl.to("#blueprintFrame", { duration: 1.6, drawSVG: "95% 95%", ease: "power1.in" })
     .to("#blueprintCorner", { duration: 1.6, drawSVG: "100% 100%", ease: "power1.in" }, "<")
-    .to("#blueprintCorner", { duration: 1, fill: "#FFFFFF" }, "<")
+    .to("#blueprintCorner", { duration: 1, fill: "none" }, "<")
     .to("#blueprintGearShape", { duration: 2, transformOrigin: "50% 50%", morphSVG: "#gearCenterOutline", fill: "#8392AA", stroke: "none", ease: "power3.out" }, "<1.5")
     .to("#blueprintCircleShape", { duration: 2, transformOrigin: "50% 50%", morphSVG: "#gearCenterCircle", fill: "#FFFFFF", stroke: "none", ease: "power3.out" }, "<")
     .to("#blueprintFrame", { autoAlpha: 0, duration: 0 })
