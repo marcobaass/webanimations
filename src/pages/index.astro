@@ -86,7 +86,7 @@ import CursorFollower from '../components/CursorFollower.astro';
               // scroll to the very bottom of the document
               lenis.scrollTo('bottom', {
                 duration: 1.2,
-                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
               });
               return;
             }
@@ -131,10 +131,6 @@ import CursorFollower from '../components/CursorFollower.astro';
 </html>
 
 <style>
-
-  html {
-    /* background: red; */
-  }
 
   body {
     position: relative;
